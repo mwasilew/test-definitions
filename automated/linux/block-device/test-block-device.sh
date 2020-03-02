@@ -23,19 +23,19 @@ USE_BONNIE=$2
 ERROR=0
 
 # Test device mounts
-mkdir -p /tmp/rmnt/$DEV
-mount -t auto $DEV_PATH /tmp/rmnt/$DEV
-if [ "$?" != "0" ]; then
+mkdir -p "/tmp/rmnt/${DEV}"
+if ! mount -t auto "${DEV_PATH}" "/tmp/rmnt/${DEV}"
+then
 	echo "Error when mounting device"
 	exit
 fi
 
-if [ "$USE_BONNIE" == "-b" ]; then
+if [ "${USE_BONNIE}" = "-b" ]; then
 	# Device mounted so run bonnie to test it.
 	echo "Using Bonnie++ to test block device $DEV ..."
 	echo "Warning: You may see out of memory errors due to the way bonnie"
 	echo "stresses the system."
-	bonnie\+\+ -u root -d /tmp/rmnt/$DEV > out-bonnie-$DEV
+	bonnie\+\+ -u root -d "/tmp/rmnt/${DEV}" > "out-bonnie-${DEV}"
 else
 	echo "Time to read 10MB from the card:"
 	time -p sh -c 'cp /tmp/rmnt/$DEV/10M .; sync'
@@ -44,25 +44,27 @@ else
 	rm 10M
 
 	# Generate a random file 10MB
-	dd if=/dev/urandom of=/tmp/$DEV-random bs=1024 count=10240
+	dd if=/dev/urandom of="/tmp/${DEV}-random" bs=1024 count=10240
 
 	echo "Time to write 10MB to the card:"
-	time -p sh -c 'cp /tmp/$DEV-random /tmp/rmnt/$DEV/$DEV-random; sync'
+	time -p sh -c 'cp /tmp/${DEV}-random /tmp/rmnt/${DEV}/${DEV}-random; sync'
 
 	# Compare files
-	cmp /tmp/$DEV-random /tmp/rmnt/$DEV/$DEV-random
-	if [ "$?" -ne "0" ]; then ERROR=1; fi
+	if ! cmp "/tmp/${DEV}-random" "/tmp/rmnt/${DEV}/${DEV}-random"
+	then
+		ERROR=1;
+	fi
 fi
 
 
 # Finished testing device so make sure we can un-mount it.
-umount /tmp/rmnt/$DEV
-if [ "$?" != "0" ]; then
+if ! umount "/tmp/rmnt/${DEV}"
+then
 	echo "Error when un-mounting device"
 fi
 
-if [ $ERROR -ne "0" ]; then
+if [ "${ERROR}" -ne "0" ]; then
 	echo "ERROR: Test failed"
 else
-	echo "Block Device $DEV tests completed ok"
+	echo "Block Device ${DEV} tests completed ok"
 fi

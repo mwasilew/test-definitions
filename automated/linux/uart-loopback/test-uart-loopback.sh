@@ -38,10 +38,10 @@ test_one () {
 # Test transfers of lengths that typically throw problems
 test_one_cfg () {
 	local settings="$*"
-	local errors=${ERRORS}
+	local errors="${ERRORS}"
 
-	stty -F "${TXUART}" ${settings}
-	stty -F "${RXUART}" ${settings}
+	stty -F "${TXUART}" "${settings}"
+	stty -F "${RXUART}" "${settings}"
 
 	for length in $(seq 1 33); do
 		test_one "${length}"
@@ -51,7 +51,7 @@ test_one_cfg () {
 	test_one 4096
 	test_one 4097
 
-	if [[ "$errors" == "$ERRORS" ]]; then
+	if [ "${errors}" = "${ERRORS}" ]; then
 		echo " pass"
 	else
 		echo " fail"
@@ -83,5 +83,5 @@ do
 done
 
 echo
-echo "Tests complete with $ERRORS Errors."
+echo "Tests complete with ${ERRORS} Errors."
 

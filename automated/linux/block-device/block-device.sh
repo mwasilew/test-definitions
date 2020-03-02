@@ -179,31 +179,31 @@ block_device_test () {
 	echo "Device=${DEVICE}"  | tee -a "${logfile}"
 
 	part_num=1
-	partdev=${DEVICE}${part_num}
-	partname=$(basename -- ${partdev})
-	devname=$(basename -- ${DEVICE})
+	partdev="${DEVICE}${part_num}"
+	partname=$(basename -- "${partdev}")
+	devname=$(basename -- "${DEVICE}")
 
 	if [ "${FORMAT_DEVICE}" = "true" ] || [ "${FORMAT_DEVICE}" = "True" ]; then
 		echo "Erase device ${DEVICE}" | tee -a "${logfile}"
-		dd if=/dev/zero of=${DEVICE} bs=512 count=2048
+		dd if=/dev/zero of="${DEVICE}" bs=512 count=2048
 		echo "Create partition table on ${DEVICE}" | tee -a "${logfile}"
-		echo 'type=83' | sfdisk --force ${DEVICE}
+		echo 'type=83' | sfdisk --force "${DEVICE}"
 		echo "Format ${partdev} as ext4" | tee -a "${logfile}"
-		mkfs.ext4 -F ${partdev}
+		mkfs.ext4 -F "${partdev}"
 	fi
 
 	# Create a 10M file on the block device
-	mnt=/tmp/rmnt/${partname}/
-	mkdir -p ${mnt}
-	mount -t auto ${partdev} ${mnt}
-	dd if=/dev/urandom of=${mnt}/10M bs=1024 count=10240
-	umount ${mnt}
+	mnt=/tmp/rmnt/"${partname}"/
+	mkdir -p "${mnt}"
+	mount -t auto "${partdev}" "${mnt}"
+	dd if=/dev/urandom of="${mnt}/10M" bs=1024 count=10240
+	umount "${mnt}"
 
 	# Test the block device - this expects the 10M file to exist
 	echo "Testing block device ${devname}" | tee -a "${logfile}"
 	./test-block-device.sh "${partdev}" | tee -a "${logfile}"
 
-	passcount=$(grep -e "completed ok" ${logfile} | wc -l)
+	passcount=$(grep -c -e "completed ok" "${logfile}")
 	if [[ "${passcount}" == "0" ]]; then
 		result=fail
 	else
@@ -215,7 +215,7 @@ block_device_test () {
 	echo "Testing block device ${devname} with bonnie++" | tee -a "${logfile}"
 	./test-block-device.sh "${partdev}" -b | tee -a "${logfile}"
 
-	passcount=$(grep -e "completed ok" ${logfile} | wc -l)
+	passcount=$(grep -c -e "completed ok" "${logfile}")
 	if [[ "${passcount}" == "0" ]]; then
 		result=fail
 	else
