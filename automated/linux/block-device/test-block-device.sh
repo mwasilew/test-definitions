@@ -8,17 +8,17 @@
 # OPTIONs:
 #  -b to run Bonie++
 
-if [ ! -n "$1" ]; then
+if [ -z "$1" ]; then
 	echo "Please specify the input block device name (e.g. /dev/mmcblk0p1) to be tested as an argument"
 	echo "You can select bonnie as the test method by specifying -b as second command parameter."
 	exit
 fi
 
-DEV_PATH=$1
+DEV_PATH="$1"
 TRIM="/dev/"
-export DEV=${DEV_PATH#${TRIM}}
+export DEV="${DEV_PATH#${TRIM}}"
 
-USE_BONNIE=$2
+USE_BONNIE="$2"
 
 ERROR=0
 
