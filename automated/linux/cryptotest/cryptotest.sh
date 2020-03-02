@@ -3,7 +3,6 @@
 
 OUTPUT="$(pwd)/output"
 RESULT_FILE="${OUTPUT}/result.txt"
-CUNIT_FILE="CUnitAutomated-Results.xml"
 CRYPTO_DEVICE="/dev/cryptotest"
 
 . ../../lib/sh-test-lib
@@ -11,14 +10,13 @@ CRYPTO_DEVICE="/dev/cryptotest"
 create_out_dir "${OUTPUT}"
 
 usage() {
-    echo "Usage: $0 [-c <crypto_device>] [-s <skip install: true|false]" 1>&2
+    echo "Usage: $0 [-c <crypto_device>]" 1>&2
     exit 1
 }
 
-while getopts "c:h:s" o; do
+while getopts "c:h" o; do
   case "$o" in
     c) CRYPTO_DEVICE="${OPTARG}" ;;
-    s) SKIP_INSTALL="${OPTARG}" ;;
     h|*) usage ;;
   esac
 done
@@ -50,7 +48,7 @@ if [ -c "${CRYPTO_DEVICE}" ]; then
 else
 	result="pass"
 fi
-echo "device-not-exists-yet ${result}" | tee -a ${RESULT_FILE}
+echo "device-not-exists-yet ${result}" | tee -a "${RESULT_FILE}"
 
 if [ "${result}" = pass ]; then
 
@@ -65,18 +63,18 @@ if [ "${result}" = pass ]; then
 	else
 		result="fail"
 	fi
-	echo "modprobe-cryptotest ${result}" | tee -a ${RESULT_FILE}
+	echo "modprobe-cryptotest ${result}" | tee -a "${RESULT_FILE}"
 fi
 
 if [ "${result}" = pass ]; then
 
 	# Check device exists
-	if [ -c ${CRYPTO_DEVICE} ]; then
+	if [ -c "${CRYPTO_DEVICE}" ]; then
 		result="pass"
 	else
 		result="fail"
 	fi
-	echo "device-exists ${result}" | tee -a ${RESULT_FILE}
+	echo "device-exists ${result}" | tee -a "${RESULT_FILE}"
 fi
 
 if [ "${result}" = pass ]; then
@@ -86,12 +84,12 @@ if [ "${result}" = pass ]; then
 	irq_done=$?
 	dmesg_grep 'crypto-safexcel-eip28 40044000.crypto_eip28: HW initialization is done'
 	hw_init_done=$?
-	if [[ "${irq_done}" -eq 0 && "${hw_init_done}" -eq 0 ]]; then
+	if [ "${irq_done}" -eq 0 ] && [ "${hw_init_done}" -eq 0 ]; then
 		result="pass"
 	else
 		result="fail"
 	fi
-	echo "modprobe-cryptotest ${result}" | tee -a ${RESULT_FILE}
+	echo "modprobe-cryptotest ${result}" | tee -a "${RESULT_FILE}"
 fi
 
 if [ "${result}" = pass ]; then
@@ -101,26 +99,26 @@ if [ "${result}" = pass ]; then
 	else
 		result="fail"
 	fi
-	echo ctests-exist ${result} | tee -a ${RESULT_FILE}
+	echo "ctests-exist ${result}" | tee -a "${RESULT_FILE}"
 fi
 
 if [ "${result}" = pass ]; then
 	logfile="${OUTPUT}/cunit-output"
-	/usr/bin/crypto_test/ctests | tee ${logfile}
+	/usr/bin/crypto_test/ctests | tee "${logfile}"
 
 	## Parse output from test
 	info_msg "Parsing results from ${logfile}"
 
 	# Expected output
 	# Number of failures      : 0
-	failures=$(grep 'Number of failures' ${logfile} | awk -F ':' '{gsub(/ /, "", $2); print $2}')
+	failures=$(grep 'Number of failures' "${logfile}" | awk -F ':' '{gsub(/ /, "", $2); print $2}')
 
-	if [ ${failures} -eq 0 ]; then
+	if [ "${failures}" -eq 0 ]; then
 		result="pass"
 	else
 		result="fail"
 	fi
-	echo "ctests ${result}" | tee -a ${RESULT_FILE}
+	echo "ctests ${result}" | tee -a "${RESULT_FILE}"
 
 fi
 
