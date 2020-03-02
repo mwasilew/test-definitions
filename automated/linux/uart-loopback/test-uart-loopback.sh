@@ -1,5 +1,5 @@
 #!/bin/bash
-# SPDX-License-Identifier: GPL-2.0
+# SPDX-License-Identifier: GPL-2.0-only
 # Copyright (C) 2019 Schneider Electric
 #
 # Test UARTs using loopback between two ports with different speeds, etc

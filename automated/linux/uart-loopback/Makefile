@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: GPL-2.0
+# SPDX-License-Identifier: GPL-2.0-only
 # Copyright (C) 2019 Schneider Electric
 LINK_TARGET = uart-loopback
 CFLAGS += -pthread -Os -Wall
