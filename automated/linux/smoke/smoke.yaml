@@ -34,3 +34,5 @@ run:
         - cd ./automated/linux/smoke/
         - ./smoke.sh -s "${SKIP_INSTALL}" -t "${TESTS}"
         - ../../utils/send-to-lava.sh ./output/result.txt
+        - if [ -n "${ARTIFACTORIAL_TOKEN}" -a -n "${ARTIFACTORIAL_URL}" ]; then
+        - ../../utils/upload-to-artifactorial.sh -a "./output/result.txt" -u "${ARTIFACTORIAL_URL}" -t "${ARTIFACTORIAL_TOKEN}"; fi;
