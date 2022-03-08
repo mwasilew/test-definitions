@@ -130,6 +130,7 @@ test_wlan_download() {
         report_skip "wlan-download"
         report_skip "wlan-download-checksum"
     fi
+    date
     local_file="$(basename "${FILE_URL}")"
     if [ -f "${local_file}" ]; then
         local_md5="$(md5sum "$(basename "${local_file}")" | awk '{print $1}')"
@@ -159,6 +160,9 @@ cleanup() {
         ip link set "${ETHERNET_DEVICE}" up
         check_return "eth-up"
     fi
+    # restore wpa_supplicant service
+    systemctl unmask wpa_supplicant
+    systemctl start wpa_supplicant
 }
 
 # Test run.
@@ -167,6 +171,9 @@ create_out_dir "${OUTPUT}"
 
 info_msg "About to run wlan download test..."
 info_msg "Output directory: ${OUTPUT}"
+
+# turn NM debug on
+dbus-send --system --print-reply --dest=org.freedesktop.NetworkManager /org/freedesktop/NetworkManager org.freedesktop.NetworkManager.SetLogging string:"debug" string:""
 
 # check if DEVICE matches any existing network interface
 if [ ! -L "/sys/class/net/${DEVICE}" ]; then
@@ -185,6 +192,8 @@ else
 fi
 
 systemctl stop wpa_supplicant # to don't interfere with our wpa_supplicant instance
+systemctl mask wpa_supplicant # prevent wpa_supplicant from being started. ip link usually starts it and makes this test unpredictable
+ip link
 ip link set "${DEVICE}" up
 sleep "${TIME_DELAY}" # XXX: some devices needs a wait after up to be ready, default: 0s
 iw dev "${DEVICE}" scan
@@ -202,3 +211,10 @@ fi
 
 # finalize the test and remove temporary files
 cleanup
+
+# print NM logs
+export SYSTEMD_COLORS=0
+journalctl -u NetworkManager --no-pager
+
+# turn NM logs off
+dbus-send --system --print-reply --dest=org.freedesktop.NetworkManager /org/freedesktop/NetworkManager org.freedesktop.NetworkManager.SetLogging string:"info" string:""
