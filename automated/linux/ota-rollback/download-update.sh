@@ -166,6 +166,16 @@ if [ -f /usr/lib/firmware/version.txt ]; then
     bootfirmware_version_after_download=$(uboot_variable_value bootfirmware_version)
     # shellcheck disable=SC2154
     compare_test_value "${TYPE}_bootfirmware_version_after_download" "${ref_bootfirmware_version_after_download}" "${bootfirmware_version_after_download}"
+
+    # obtain new deployment hash
+    DEPLOYMENT_HASH=$(ostree admin status | grep pending | awk -F' ' '{print $2}')
+    echo "New value of version.txt in /sysroot/ostree/deploy/lmp/deploy/${DEPLOYMENT_HASH}/usr/lib/firmware/version.txt"
+    cat "/sysroot/ostree/deploy/lmp/deploy/${DEPLOYMENT_HASH}/usr/lib/firmware/version.txt"
+
+    journalctl -u aktualizr-lite --no-pager | grep "Target firmware version:"
+    journalctl -u aktualizr-lite --no-pager | grep "Current boot firmware version:"
+    journalctl -u aktualizr-lite --no-pager | grep "Update firmware to version:"
+
     fiovb_is_secondary_boot_after_download=$(uboot_variable_value "${SECONDARY_BOOT_VAR_NAME}")
     compare_test_value "${TYPE}_fiovb_is_secondary_boot_after_download" "${ref_fiovb_is_secondary_boot_after_download}" "${fiovb_is_secondary_boot_after_download}"
 else
