@@ -1,0 +1,11 @@
+[Unit]
+Description=Cause a panic to initiate a rollback
+Before=aktualizr-lite.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/usr/local/bin/panic.sh
+
+[Install]
+WantedBy=basic.target

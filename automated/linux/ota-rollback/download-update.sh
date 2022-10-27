@@ -15,8 +15,8 @@ export UBOOT_VAR_SET_TOOL
 PACMAN_TYPE="ostree+compose_apps"
 
 usage() {
-	echo "\
-	Usage: $0 [-t <kernel|uboot>] [-u <u-boot var read>] [-s <u-boot var set>] [-o <ostree|ostree+compose_apps>]
+    echo "\
+    Usage: $0 [-t <kernel|uboot|panic>] [-u <u-boot var read>] [-s <u-boot var set>] [-o <ostree|ostree+compose_apps>]
 
     -t <kernel|uboot>
         This determines type of corruption test performed:
@@ -36,17 +36,17 @@ usage() {
         These change the 'type' variable in 'pacman' section
         of the final .toml file used by aklite. Default is
         ostree+compose_apps
-	"
+    "
 }
 
 while getopts "t:u:s:o:h" opts; do
-	case "$opts" in
+    case "$opts" in
         t) TYPE="${OPTARG}";;
         u) UBOOT_VAR_TOOL="${OPTARG}";;
         s) UBOOT_VAR_SET_TOOL="${OPTARG}";;
         o) PACMAN_TYPE="${OPTARG}";;
         h|*) usage ; exit 1 ;;
-	esac
+    esac
 done
 
 # the script works only on builds with aktualizr-lite
@@ -72,6 +72,17 @@ ref_upgrade_available_after_download=1
 ref_fiovb_is_secondary_boot_after_download=0
 if [ "${TYPE}" = "uboot" ]; then
     ref_bootupgrade_available_after_download=1
+fi
+
+# setup systemd service before downloading ostree
+if [ "${TYPE}" = "panic" ]; then
+    cp panic.service /etc/systemd/system/
+    cp panic.sh /usr/local/bin/
+    ls -l /etc/systemd/system
+    ls -l /usr/local/bin
+    systemctl enable panic
+    systemctl daemon-reload
+    sync
 fi
 
 # configure aklite callback
@@ -139,11 +150,11 @@ fi
 SIGNAL=$(</var/sota/ota.signal)
 while [ ! "${SIGNAL}" = "install-post" ]
 do
-	echo "Sleeping 1s"
-	sleep 1
-	cat /var/sota/ota.signal
-	SIGNAL=$(</var/sota/ota.signal)
-	echo "SIGNAL: ${SIGNAL}."
+    echo "Sleeping 1s"
+    sleep 1
+    cat /var/sota/ota.signal
+    SIGNAL=$(</var/sota/ota.signal)
+    echo "SIGNAL: ${SIGNAL}."
 done
 report_pass "${TYPE}-install-post-received"
 

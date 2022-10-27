@@ -47,6 +47,9 @@ done
 ! check_root && error_msg "You need to be root to run this script."
 create_out_dir "${OUTPUT}"
 
+tree /etc/systemd/system
+ls -l /usr/local/bin
+
 SECONDARY_BOOT_VAR_NAME="fiovb.is_secondary_boot"
 if [ "${UBOOT_VAR_TOOL}" != "fw_printenv" ]; then
     SECONDARY_BOOT_VAR_NAME="is_secondary_boot"
