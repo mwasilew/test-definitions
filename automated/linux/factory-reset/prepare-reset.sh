@@ -52,6 +52,7 @@ cp z-99-aklite-callback.toml /etc/sota/conf.d/
 if [ -n "${LABEL}" ]; then
     echo "tags = \"${LABEL}\"" >> /etc/sota/conf.d/z-99-aklite-callback.toml
 fi
+cat /etc/sota/conf.d/z-99-aklite-callback.toml
 # create signal files
 touch /var/sota/ota.signal
 touch /var/sota/ota.result
@@ -88,3 +89,4 @@ touch "/var/.${TYPE}"
 if [ -n "${ADDITIONAL_TYPE}" ]; then
     touch "/var/.${ADDITIONAL_TYPE}"
 fi
+ls -la /var/
