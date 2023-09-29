@@ -14,6 +14,9 @@ PIN=87654321
 AKLITE_TOKEN_LABEL=aktualizr
 AKLITE_CERT_LABEL=SE_83000043
 SE05X_TEST_LABEL=test_label
+RESET_SE05X=False
+AWS_ENDPOINT=""
+AWS_CONTAINER=""
 
 usage() {
     echo "\
@@ -26,6 +29,9 @@ usage() {
         Initialize pkcs11 slot with random token.
         This checks whether auto-registration script
         can deal with alread initialized pkcs11.
+        Default: false
+    -r <true|false>
+        Reset SE050 element to factory settings
         Default: false
     "
 }
@@ -44,10 +50,11 @@ systemd_variable_value() {
 }
 
 
-while getopts "p:s:h" opts; do
+while getopts "p:s:r:h" opts; do
     case "$opts" in
         p) PTOOL="${OPTARG}";;
         s) SLOT_INIT="${OPTARG}";;
+        r) RESET_SE05X="${OPTARG}";;
         h|*) usage ; exit 1 ;;
     esac
 done
@@ -109,9 +116,15 @@ check_return "lmp-el2go-service-deactivate"
 systemctl is-active aktualizr-lite
 check_return "el2go-aklite-running"
 
+# test AWS
+# This only works if AWS IoT JIT is configured properly
+if [ -n "${AWS_ENDPOINT}" ] && [ -n "${AWS_CONTAINER}" ]; then
+    docker run -it -e AWS_ENDPOINT="${AWS_ENDPOINT}" --device=/dev/tee0:/dev/tee0 "${AWS_CONTAINER}"
+fi
+
 # cleanup
 #echo "Cleanup SE050"
 # reset se050
-#ssscli connect se05x t1oi2c none
-#ssscli se05x reset
-#ssscli disconnect
+if [ "${RESET_SE05X}" = "True" ] || [ "${RESET_SE05X}" = "true" ]; then
+    fio-se05x-cli --factory-reset --se050
+fi
