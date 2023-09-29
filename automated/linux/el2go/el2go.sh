@@ -134,5 +134,7 @@ fi
 #echo "Cleanup SE050"
 # reset se050
 if [ "${RESET_SE05X}" = "True" ] || [ "${RESET_SE05X}" = "true" ]; then
+    # stop aklite to prevent TA panic
+    systemctl stop aktualizr-lite
     fio-se05x-cli --factory-reset --se050
 fi
