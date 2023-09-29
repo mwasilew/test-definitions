@@ -14,7 +14,7 @@ PIN=87654321
 AKLITE_TOKEN_LABEL=aktualizr
 AKLITE_CERT_LABEL=SE_83000043
 SE05X_TEST_LABEL=test_label
-RESET_SE05X=False
+RESET_SE05X=True
 AWS_ENDPOINT=""
 AWS_CONTAINER=""
 
@@ -32,7 +32,11 @@ usage() {
         Default: false
     -r <true|false>
         Reset SE050 element to factory settings
-        Default: false
+        Default: true
+    -e <AWS IoT Endpoint URL>
+    -c <AWS test container>
+        Container connects to the endpoint to create
+        AWS IoT Thing
     "
 }
 
@@ -50,7 +54,7 @@ systemd_variable_value() {
 }
 
 
-while getopts "p:s:r:h" opts; do
+while getopts "p:s:r:e:c:h" opts; do
     case "$opts" in
         p) PTOOL="${OPTARG}";;
         s) SLOT_INIT="${OPTARG}";;
@@ -108,8 +112,9 @@ fi
 
 journalctl --no-pager -u lmp-el2go-auto-register
 
+. /etc/os-release
 $PTOOL --pin "${PIN}" --token-label "${AKLITE_TOKEN_LABEL}" --read-object --label "${AKLITE_CERT_LABEL}" --type cert --output-file cert.der
-openssl x509 -in cert.der -issuer -noout | grep lmp-ci-se05x
+openssl x509 -in cert.der -issuer -noout | grep "${LMP_FACTORY}"
 check_return "el2go-retrieve-certificate"
 journalctl --no-pager -u lmp-el2go-auto-register | grep "Deactivated successfully"
 check_return "lmp-el2go-service-deactivate"
@@ -120,6 +125,9 @@ check_return "el2go-aklite-running"
 # This only works if AWS IoT JIT is configured properly
 if [ -n "${AWS_ENDPOINT}" ] && [ -n "${AWS_CONTAINER}" ]; then
     docker run -it -e AWS_ENDPOINT="${AWS_ENDPOINT}" --device=/dev/tee0:/dev/tee0 "${AWS_CONTAINER}"
+    check_return "el2go-aws-iot"
+else
+    report_skip "el2go-aws-iot"
 fi
 
 # cleanup
