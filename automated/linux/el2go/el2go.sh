@@ -11,7 +11,8 @@ SLOT_INIT=False
 PTOOL="pkcs11-tool --module /usr/lib/libckteec.so.0.1.0"
 SO_PIN=12345678
 PIN=87654321
-#SE05X_SLOT_LABEL=aktualizr
+AKLITE_TOKEN_LABEL=aktualizr
+AKLITE_CERT_LABEL=SE_83000043
 SE05X_TEST_LABEL=test_label
 
 usage() {
@@ -100,9 +101,8 @@ fi
 
 journalctl --no-pager -u lmp-el2go-auto-register
 
-journalctl --no-pager -u lmp-el2go-auto-register | grep "Getting Certificate"
-check_return "el2go-get-certificate"
-journalctl --no-pager -u lmp-el2go-auto-register | grep "Retrieved Certificate"
+$PTOOL --pin "${PIN}" --token-label "${AKLITE_TOKEN_LABEL}" --read-object --label "${AKLITE_CERT_LABEL}" --type cert --output-file cert.der
+openssl x509 -in cert.der -issuer -noout | grep lmp-ci-se05x
 check_return "el2go-retrieve-certificate"
 journalctl --no-pager -u lmp-el2go-auto-register | grep "Deactivated successfully"
 check_return "lmp-el2go-service-deactivate"
@@ -110,8 +110,8 @@ systemctl is-active aktualizr-lite
 check_return "el2go-aklite-running"
 
 # cleanup
-echo "Cleanup SE050"
+#echo "Cleanup SE050"
 # reset se050
-ssscli connect se05x t1oi2c none
-ssscli se05x reset
-ssscli disconnect
+#ssscli connect se05x t1oi2c none
+#ssscli se05x reset
+#ssscli disconnect
