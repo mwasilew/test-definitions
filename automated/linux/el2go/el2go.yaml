@@ -18,7 +18,7 @@ metadata:
         - imx6ull
 
 params:
-    PTOOL: "pkcs11-tool --module /usr/lib/libckteec.so.0.1"
+    PTOOL: "pkcs11-tool --module /usr/lib/libckteec.so.0.1.0"
     SLOT_INIT: "False"
 
 run:
