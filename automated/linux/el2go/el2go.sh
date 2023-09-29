@@ -82,7 +82,7 @@ done
 # check if the device was registered
 
 echo "Check if the device is properly registered"
-systemctl status --no-pager lmp-el2go-auto-register
+systemctl status --no-pager --full lmp-el2go-auto-register
 # should be 0 - exit without error
 EXEC_STATUS=$(systemd_variable_value ExecMainStatus lmp-el2go-auto-register)
 if [  "${EXEC_STATUS}" = 0 ]; then
@@ -97,6 +97,8 @@ if [ "${EXEC_CODE}" = 1 ]; then
 else
     report_fail lmp-el2go-auto-register-running
 fi
+
+journalctl --no-pager -u lmp-el2go-auto-register
 
 journalctl --no-pager -u lmp-el2go-auto-register | grep "Getting Certificate"
 check_return "el2go-get-certificate"
