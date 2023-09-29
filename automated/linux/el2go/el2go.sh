@@ -20,7 +20,7 @@ AWS_CONTAINER=""
 
 usage() {
     echo "\
-    Usage: $0 [-p <pkcs11-tool>] [-s <true|false>]
+    Usage: $0 [-p <pkcs11-tool>] [-s <true|false>] [-r <true|false>] [-e <AWS endpoint>] [-c <AWS container>]
 
     -p <pkcs11-tool>
         pkcs11-tool with all the options required. Default is:
@@ -59,6 +59,8 @@ while getopts "p:s:r:e:c:h" opts; do
         p) PTOOL="${OPTARG}";;
         s) SLOT_INIT="${OPTARG}";;
         r) RESET_SE05X="${OPTARG}";;
+        e) AWS_ENDPOINT="${OPTARG}";;
+        c) AWS_CONTAINER="${OPTARG}";;
         h|*) usage ; exit 1 ;;
     esac
 done
