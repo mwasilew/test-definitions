@@ -20,9 +20,12 @@ metadata:
 params:
     PTOOL: "pkcs11-tool --module /usr/lib/libckteec.so.0.1.0"
     SLOT_INIT: "False"
+    RESET_SE05X: "True"
+    AWS_ENDPOINT: ""
+    AWS_CONTAINER: ""
 
 run:
     steps:
         - cd ./automated/linux/el2go/
-        - ./el2go.sh -s "${SLOT_INIT}" -p "${PTOOL}"
+        - ./el2go.sh -s "${SLOT_INIT}" -p "${PTOOL}" -r "${RESET_SE05X}" -e "${AWS_ENDPOINT}" -c "${AWS_CONTAINER}"
         - ../../utils/send-to-lava.sh ./output/result.txt
