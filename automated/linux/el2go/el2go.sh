@@ -115,6 +115,7 @@ fi
 journalctl --no-pager -u lmp-el2go-auto-register
 
 . /etc/os-release
+$PTOOL --pin "${PIN}" --token-label "${AKLITE_TOKEN_LABEL}" --list-objects
 $PTOOL --pin "${PIN}" --token-label "${AKLITE_TOKEN_LABEL}" --read-object --label "${AKLITE_CERT_LABEL}" --type cert --output-file cert.der
 # LMP_FACTORY is set in /etc/os-release
 openssl x509 -in cert.der -issuer -noout | grep "${LMP_FACTORY}"
