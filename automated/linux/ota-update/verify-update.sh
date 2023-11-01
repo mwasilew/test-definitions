@@ -103,6 +103,9 @@ compare_test_value "bootfirmware_version_after_upgrade" "${ref_bootfirmware_vers
 fiovb_is_secondary_boot_after_upgrade=$(uboot_variable_value "${SECONDARY_BOOT_VAR_NAME}")
 compare_test_value "fiovb_is_secondary_boot_after_upgrade" "${ref_fiovb_is_secondary_boot_after_upgrade}" "${fiovb_is_secondary_boot_after_upgrade}"
 
+foobar_after=$(uboot_variable_value foobar)
+compare_test_value "foobar_after" "100" "${foobar_after}"
+
 . /etc/os-release
 # shellcheck disable=SC2154
 compare_test_value "target_version_after_upgrade" "${REF_TARGET_VERSION}" "${IMAGE_VERSION}"

@@ -98,6 +98,7 @@ systemctl enable --now lmp-device-auto-register || error_fatal "Unable to regist
 # if there isn't, terminate the job
 # use "${upgrade_available_after_download}" for now. Find a better solution later
 
+"${UBOOT_VAR_SET_TOOL}" foobar 100
 while ! systemctl is-active aktualizr-lite; do
     echo "Waiting for aktualizr-lite to start"
     sleep 1
@@ -173,6 +174,9 @@ else
     report_skip "${TYPE}_bootfirmware_version_after_download"
     report_skip "${TYPE}_fiovb_is_secondary_boot_after_download"
 fi
+
+foobar=$(uboot_variable_value foobar)
+compare_test_value "${TYPE}_foobar" "100" "${foobar}"
 
 UPGRADE_AVAILABLE="${upgrade_available_after_download}"
 if [ "${TYPE}" = "uboot" ]; then
