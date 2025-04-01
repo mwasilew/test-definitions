@@ -71,6 +71,7 @@ done
 ! check_root && error_msg "You need to be root to run this script."
 create_out_dir "${OUTPUT}"
 
+ls -l /var/sota
 SECONDARY_BOOT_VAR_NAME="fiovb.is_secondary_boot"
 if [ "${UBOOT_VAR_TOOL}" != "fw_printenv" ]; then
     SECONDARY_BOOT_VAR_NAME="is_secondary_boot"
@@ -93,6 +94,7 @@ fi
 # configure aklite callback
 cp aklite-callback.sh /var/sota/
 chmod 755 /var/sota/aklite-callback.sh
+ls -l /var/sota
 
 mkdir -p "${SOTA_CONFDIR}"
 cp z-99-aklite-callback.toml "${SOTA_CONFDIR}"
@@ -105,6 +107,7 @@ if [ -n "${HSM_MODULE}" ]; then
     echo "HSM_PIN=87654321" >> /etc/sota/hsm
     echo "HSM_SOPIN=12345678" >> /etc/sota/hsm
 fi
+ls -l /var/sota
 report_pass "${TYPE}-create-aklite-callback"
 # create signal files
 touch /var/sota/ota.signal
@@ -116,6 +119,7 @@ if [ "${TYPE}" = "uboot" ] && [ -n "${U_BOOT_VARIABLE_NAME}" ]; then
 fi
 #systemctl mask aktualizr-lite
 # enabling lmp-device-auto-register will fail because aklite is masked
+ls -l /var/sota
 systemctl enable --now lmp-device-auto-register || error_fatal "Unable to register device"
 # aktualizr-lite update
 # TODO: check if there is an update to download
@@ -124,6 +128,7 @@ systemctl enable --now lmp-device-auto-register || error_fatal "Unable to regist
 
 while ! systemctl is-active aktualizr-lite; do
     echo "Waiting for aktualizr-lite to start"
+    journalctl --no-pager -u lmp-device-auto-register
     sleep 1
 done
 # add some delay so aklite can setup variables
