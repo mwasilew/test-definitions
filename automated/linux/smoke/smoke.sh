@@ -37,7 +37,7 @@ run() {
     echo
     info_msg "Running ${test_case_id} test..."
     eval "${test}"
-    check_return "${test_case_id}"
+    report_fail "${test_case_id}"
 }
 
 # Test run.
