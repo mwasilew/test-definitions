@@ -1,0 +1,35 @@
+metadata:
+    format: Lava-Test Test Definition 1.0
+    name: pre-suspend-check
+    description: "Record the state of the machine before it is suspended, so that
+                  resume-check can confirm afterwards that a suspend/resume cycle
+                  really happened. This test does not suspend the machine: run it,
+                  trigger the suspend by whatever means the job uses, then run
+                  resume-check once the machine is back up."
+    maintainer:
+        - milosz.wasilewski@oss.qualcomm.com
+    os:
+        - debian
+        - ubuntu
+        - centos
+        - fedora
+        - openembedded
+    scope:
+        - functional
+    devices:
+        - juno
+        - hi6220-hikey
+        - x86
+
+params:
+    # Where to save the recorded state. resume-check must be given the same path.
+    STATE_FILE: "/tmp/pre-suspend-state.txt"
+    # When set, check that this sleep mode is offered by /sys/power/state.
+    # Leave empty to skip the check.
+    SLEEP_MODE: ""
+
+run:
+    steps:
+        - cd ./automated/linux/resume-check/
+        - ./pre-suspend-check.sh -p "${STATE_FILE}" -m "${SLEEP_MODE}"
+        - ../../utils/send-to-lava.sh ./output/result.txt
